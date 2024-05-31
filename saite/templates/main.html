@@ -1,0 +1,98 @@
+{% extends "headerfooter.html" %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Django Site{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/stylemain.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main>
+        <div class="hero-image">
+            <img src="{% static 'images/main/main1.png' %}" alt="Initial Image" class="image" id="image1">
+            <img src="{% static 'images/main/main2.png' %}" alt="Secondary Image" class="image" id="image2" style="opacity: 0;">
+            <div class="hero-text">
+                <h1 class="city-selector">Выбери свой город</h1>
+                <p class="event-search">И ищи мероприятия</p>
+            </div>
+        </div>
+        <div class="container">
+            <h1>Как пользоваться</h1>
+            <div class="steps">
+                <div class="step">
+                    <div class="content">
+                        <h2>Шаг 1</h2>
+                        <div class="text">
+                            <p>Для начала, вам нужно войти на сайт
+                            с помощью телеграм бота, в чате с ним
+                            нужно будет ввести команду /vhod
+                            и бот отправит вам личную ссылку вход
+                            на сайт, после перехода по ссылке
+                            вы будете автоматически залогиненны.</p>
+                        </div>
+                    </div>
+                    <div class="arrow>">
+                    <img src="{% static 'images/main/step.png' %}">
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="content">
+                        <h2>Шаг 2</h2>
+                        <div class="text">
+                            <p>Далее справа в углу у вас появится
+                            кнопка “Настроить бота” нажмите ее
+                            вас направит на страницу настройки,
+                            вам нужно будет выбрать город,
+                            и ключевые слова, слова указывать
+                            в ковычках и жмем сахранить.
+                            Бот отправит вам сообщение что
+                            настройки успешно сохранены.</p>
+                        </div>
+                    </div>
+                    <div class="arrow>">
+                    <img src="{% static 'images/main/step.png' %}">
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="content">
+                        <h2>Шаг 3</h2>
+                        <div class="text">
+                            <p>Так же если вы не хотите придумывать
+                            какие настройки хотите, вы можете
+                            перейти в каталог и взять настройки
+                            других пользователей, ну или же
+                            использовать их как пример
+                            и настроить их настройки под себя.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if user.is_authenticated %}
+        <a class="button-container" href="{% url 'settings-page' %}">
+            <p class="configure-bot">Настроить бота</p>
+        </a>
+        {% else %}
+        <a class="button-container" href="https://t.me/EvHubBot">
+            <span class="configure-bot">Настроить бота</span>
+        </a>
+        {% endif %}
+        <div id="loader" class="loader">
+            <div class="loader-content">
+                <img src="{% static 'images/main/load.gif' %}" alt="Loading" />
+            </div>
+        </div>
+    </main>
+    <script src="{% static 'js/jsmain.js' %}"></script>
+    <script src="{% static 'js/jsloader.js' %}"></script>
+</body>
+{% endblock %}
+</html>

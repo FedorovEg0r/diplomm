@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@600&display=swap');
+
+:root {
+    --font-size-base-min: 16px;
+    --font-size-base-max: 18px;
+    --screen-width-min: 320px;
+    --screen-width-max: 1920px;
+    --logo-size-min: 60px;
+    --logo-size-max: 100px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Jost', sans-serif;
+    font-size: calc(var(--font-size-base-min) + (var(--font-size-base-max) - var(--font-size-base-min)) * ((100vw - var(--screen-width-min)) / (var(--screen-width-max) - var(--screen-width-min))));
+    background-color: #fff;
+    color: #333;
+}
+
+.text {
+    text-align: justify;
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: var(--font-size-base-min);
+    }
+}
+
+@media (min-width: 1920px) {
+    body {
+        font-size: var(--font-size-base-max);
+    }
+}
+
+.main-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 7%;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+}
+
+.image-container img {
+    width: 100%;
+    display: block;
+}
+
+.second-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 -24px 35.9px rgba(0, 0, 0, 0.13);
+}
+
+.about-section {
+    display: flex;
+    width: 80%;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.about-section h1 {
+    font-size: 3.5em;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.stat {
+    flex: 1;
+    font-size: 1.5em;
+    margin: 5%;
+}
+
+.stat span {
+    display: block;
+    font-size: 2em;
+    color: #007bff;
+}
+
+.description {
+    text-align: justify;
+    line-height: 1.8;
+}
+
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(38, 38, 38, 0.8);
+    visibility: hidden;
+    z-index: 1000;
+}
+
+.loader-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}

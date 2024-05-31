@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Evhub{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/headerfooter.css' %}">
+</head>
+<body>
+<script src="{% static 'js/jsloader.js' %}"></script>
+<header>
+    <nav class="navbar">
+        <a href="{% url 'main-page' %}" class="logo-container">
+            <img src="{% static 'images/header/logo.svg' %}" alt="Логотип" class="logo">
+        </a>
+
+        <ul class="nav-list">
+            <li><a href="{% url 'main-page' %}" class="text-button">Главная</a></li>
+            <li><a href="{% url 'news-page' %}" class="text-button">Новости</a></li>
+            <li><a href="{% url 'about-page' %}" class="text-button">О нас</a></li>
+            {% if user.is_authenticated %}
+            <li>
+                <a href="{% url 'settings-page' %}" class="custom-button">
+                    <span class="icon-container">
+                        <img width="21" height="29" fill="none" src="{% static 'images/header/bot.svg' %}">
+                    </span>
+                    <span class="divider"></span>
+                    <span class="text">Настроить бота</span>
+                </a>
+            </li>
+            {% else %}
+            <li>
+                <a class="custom-button2" href="https://t.me/EvHubBot">
+                    <span class="icon-container">
+                        <img width="21" height="29" fill="none" src="{% static 'images/header/telegaicon.svg' %}">
+                    </span>
+                    <span class="divider"></span>
+                    <span class="text">Вход Telegram</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+
+        <div class="otstup"></div>
+        <button class="burger-button" onclick="toggleMenu()">
+            <span class="burger-bar"></span>
+            <span class="burger-bar"></span>
+            <span class="burger-bar"></span>
+        </button>
+    </nav>
+</header>
+<main>
+    {% block content %}
+
+    {% endblock %}
+</main>
+<footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>Быстрые ссылки</h3>
+            <ul class="footer-links">
+                <li><a href="{% url 'main-page' %}">Главная</a></li>
+                <li><a href="{% url 'news-page' %}">Новости</a></li>
+                <li><a href="{% url 'about-page' %}">О нас</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Контакты</h3>
+            <p>Email: support@evhub.com</p>
+            <p>Telegram: @evhub_support</p>
+        </div>
+        <div class="footer-section">
+            <h3>Мы в социальных сетях</h3>
+            <a href="#" class="footer-link">Facebook</a>
+            <a href="#" class="footer-link">Twitter</a>
+            <a href="#" class="footer-link">Instagram</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2024 EvHub. Все права защищены.</p>
+        <p>
+            <a href="#">Политика конфиденциальности</a>
+            <a href="#">Условия использования</a>
+        </p>
+    </div>
+</footer>
+<script src="{% static 'saite/js/jsmain.js' %}"></script>
+<script>
+    function toggleMenu() {
+        const navList = document.querySelector('.nav-list');
+        const burgerButton = document.querySelector('.burger-button');
+        navList.classList.toggle('active');
+        burgerButton.classList.toggle('active');
+    }
+    loader.style.visibility = 'hidden';
+</script>
+<script src="https://cdn.ckeditor.com/ckeditor5/12.3.1/classic/ckeditor.js"></script>
+</body>
+</html>
+

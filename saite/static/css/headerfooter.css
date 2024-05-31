@@ -1,0 +1,258 @@
+:root {
+    --font-size-base-min: 16px;
+    --font-size-base-max: 18px;
+    --screen-width-min: 320px;
+    --screen-width-max: 1920px;
+    --logo-size-min: 60px;
+    --logo-size-max: 100px;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #333;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.2);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+header.shadow {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.logo {
+    width: calc(var(--logo-size-min) + (var(--logo-size-max) - var(--logo-size-min)) * ((100vw - var(--screen-width-min)) / (var(--screen-width-max) - var(--screen-width-min))));
+    height: auto;
+}
+
+.custom-button:hover {
+    background-color: #124f70;
+}
+
+.icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.divider {
+    width: 1px;
+    height: 24px;
+    background-color: #7F7F7F;
+    margin: 0 12px;
+}
+@media (max-width: 768px) {
+    .logo {
+        width: var(--logo-size-min);
+    }
+}
+
+@media (min-width: 1920px) {
+    .logo {
+        width: var(--logo-size-max);
+    }
+
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    margin: 0 auto;
+    padding: 10px 20px;
+    color: #fff;
+    position: relative;
+}
+
+.logo-container img {
+    height: 40px;
+}
+
+.nav-list {
+    display: flex;
+    list-style-type: none;
+    align-items:center;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0;
+    margin-left: 10%;
+}
+
+.nav-list li {
+    margin: 0 15px;
+}
+
+.text-button {
+    color: #fff;
+    text-decoration: none;
+}
+
+.text-button:hover {
+    text-decoration: underline;
+}
+
+.otstup {
+    flex-grow: 1;
+}
+
+.custom-button, .custom-button2 {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    background-color: #007BFF;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-left: 10px;
+}
+
+.custom-button .icon-container, .custom-button2 .icon-container {
+    display: flex;
+    align-items: center;
+}
+
+.burger-button {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.burger-bar {
+    width: 25px;
+    height: 3px;
+    background-color: #fff;
+    margin: 3px 0;
+}
+
+@media (max-width: 768px) {
+    .nav-list {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        margin: 0 ;
+        text-align: center;
+        background-color: #333;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+    }
+
+    .nav-list li {
+        margin: 10px 0;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .burger-button {
+        display: flex;
+    }
+
+    .nav-list.active {
+        display: flex;
+    }
+
+    .custom-button, .custom-button2 {
+        display: none;
+        margin-top: 10px;
+    }
+
+    .nav-list.active .custom-button, .nav-list.active .custom-button2 {
+        display: flex;
+    }
+}
+
+.navbar .burger-button.active + .nav-list {
+    display: flex;
+}
+
+footer {
+    background-color: #e9ecef;
+    padding-top: 20px;
+    text-align: center;
+    border-top: 1px solid #e9ecef;
+    margin-top: 7%;
+    border-top: solid 2px;
+    border-color: #cdcdcd75;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.footer-section {
+    flex: 1;
+    padding: 10px;
+}
+
+.footer-section h3 {
+    margin-bottom: 10px;
+}
+
+.footer-section p {
+    margin: 0;
+}
+
+.footer-links {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin: 0;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.footer-bottom {
+    background-color: rgb(233 236 239);
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.footer-bottom p {
+    margin: 0;
+    color: black;
+}
+
+.footer-bottom a {
+    text-decoration: none;
+    color: #007bff;
+    margin-right: 10px;
+}

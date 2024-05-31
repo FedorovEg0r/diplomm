@@ -1,0 +1,58 @@
+{% extends "headerfooter.html" %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evhub О нас</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styleabout.css' %}">
+</head>
+<body>
+    <main>
+        <div class="main-container">
+            <div class="image-container">
+                <img src="{% static 'images/about/telephone.svg' %}" alt="Телефон">
+            </div>
+        </div>
+        <div class="second-container">
+            <div class="about-section">
+                <h1>О нас</h1>
+                <div class="stats">
+                    <div class="stat">
+                        <span>{{ user_count }}</span>
+                        Активных пользователей
+                    </div>
+                    <div class="stat">
+                        <span>24/7</span>
+                        Бот активен
+                    </div>
+                    <div class="stat">
+                        <span>99%</span>
+                        Довольных пользователей
+                    </div>
+                    <div class="stat">
+                        <span>{{ city_count }}</span>
+                        Охвачено городов
+                    </div>
+                </div>
+                <div class="description">
+                    <p>EvHub — это инновационный проект, созданный для того, чтобы упростить процесс поиска интересных мероприятий в Telegram. Мы понимаем, насколько важно быть в курсе всех событий, происходящих в вашем городе или области, будь то концерты, выставки, спортивные мероприятия или культурные события. Наша миссия — предоставить пользователям простой и удобный инструмент, который позволяет получать актуальную информацию о мероприятиях, соответствующих их интересам.</p>
+                    <br><p>С помощью нашего бота вы можете быстро и легко настроить персонализированные уведомления, просто введя ключевые слова, которые вас интересуют. Бот будет автоматически искать и отправлять вам информацию о соответствующих событиях, избавляя вас от необходимости постоянно мониторить различные источники.</p>
+                </div>
+            </div>
+        </div>
+        <div id="loader" class="loader">
+            <div class="loader-content">
+                <img src="{% static 'images/main/load.gif' %}" alt="Loading" />
+            </div>
+        </div>
+    </main>
+<script src="{% static 'js/jsloader.js' %}"></script>
+</body>
+{% endblock %}
+</html>

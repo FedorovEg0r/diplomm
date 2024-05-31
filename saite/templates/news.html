@@ -1,0 +1,60 @@
+{% extends "headerfooter.html" %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evhub О нас</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/stylenews.css' %}">
+
+</head>
+<body>
+    <main>
+        <div class="hero-image">
+            <img src="{% static 'images/news/news.png' %}" alt="Initial Image" class="image" id="image1">
+            <img src="{% static 'images/news/news2.png' %}" alt="Secondary Image" class="image" id="image2" style="opacity: 0;">
+            <div class="hero-text" id="heroText">Новости</div>
+        </div>
+
+        {% if is_admin %}
+            <button id="add-news-btn" class="add-news-btn">+</button>
+            <div id="editor-container" style="display:none;">
+                <input type="text" id="news-title" placeholder="Название новости">
+                <textarea id="news-editor"></textarea>
+                <button id="save-news-btn" class="save-news-btn" data-url="{% url 'news-page' %}">Добавить</button>
+            </div>
+        {% endif %}
+        <div id="news-container">
+            {% for news in news %}
+                <div class="news-item" data-news-id="{{ news.id }}">
+                    <h2>{{ news.title }}</h2>
+                    <p>{{ news.created_at|date:"d.m.Y" }}</p>
+                    <div>{{ news.content|safe }}</div>
+                     {% if is_admin %}
+                    <button class="delete-news-btn">Удалить</button>
+                    <div class="delete-confirmation">
+                        Вы уверены, что хотите удалить?
+                        <button class="confirm-delete-btn">Удалить</button>
+                        <button class="cancel-delete-btn">Отмена</button>
+                    </div>
+                    {% endif %}
+                    <hr>
+                </div>
+            {% endfor %}
+        </div>
+        <div id="loader" class="loader">
+            <div class="loader-content">
+                <img src="{% static 'images/main/load.gif' %}" alt="Loading" />
+            </div>
+        </div>
+    </main>
+    <script src="{% static 'js/jsnews.js' %}"></script>
+    <script src="{% static 'js/jsloader.js' %}"></script>
+</body>
+</html>
+{% endblock %}

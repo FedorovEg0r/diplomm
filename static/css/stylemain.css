@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@600&display=swap');
+
+:root {
+    --font-size-base-min: 16px;
+    --font-size-base-max: 18px;
+    --screen-width-min: 320px;
+    --screen-width-max: 1920px;
+	--logo-size-min: 60px;
+    --logo-size-max: 100px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Jost', sans-serif;
+    font-size: calc(var(--font-size-base-min) + (var(--font-size-base-max) - var(--font-size-base-min)) * ((100vw - var(--screen-width-min)) / (var(--screen-width-max) - var(--screen-width-min))));
+    background-color: #fff;
+    color: #333;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.3s ease-in-out;
+}
+
+.hero-image {
+    position: relative;
+    width: 100%;
+    height: 670px;
+}
+
+.hero-image .image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.hero-text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    text-align: center;
+    transition: opacity 0.5s ease-in-out;
+    margin-top: 20px;
+}
+
+.hero-text h1.city-selector {
+    font-size: 55px;
+    font-weight: 600;
+    font-family: "Jost", sans-serif;
+}
+
+.hero-text p.event-search {
+    font-size: 55px;
+    font-weight: 600;
+    background-color: white;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Jost', sans-serif;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.configure-bot {
+    width: 300px;
+    height: 70px;
+    background-color: #155F86;
+    color: white;
+    font-size: 25px;
+    font-family: 'Jost', sans-serif;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 20px;
+}
+
+.configure-bot:hover {
+    background-color: #007BFF;
+}
+.container {
+    width: 80%;
+    margin: 1% auto 5% auto;
+}
+
+.container h1{
+    color: #000;
+    text-align: center;
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    margin-top: 5%;
+}
+
+.steps img{
+    max-width: 1%;
+    min-width: 10px;
+    margin: 100% auto;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.step {
+    margin: 0 auto;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+	opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    will-change: opacity, transform;
+}
+
+.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.text {
+    text-align: justify;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.step h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.step h2 {
+    color: #333;
+    text-align: center;
+}
+
+.step p {
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: justify;
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: var(--font-size-base-min);
+    }
+    .steps{
+        width: 100%;
+    }
+
+    .step{
+        width: 100%;
+    }
+    .text{
+        width: 100%;
+    }
+}
+
+@media (min-width: 1920px) {
+    body {
+        font-size: var(--font-size-base-max);
+    }
+}
+
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(38, 38, 38, 0.8);
+    visibility: hidden;
+    z-index: 1000;
+}
+
+.loader-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}

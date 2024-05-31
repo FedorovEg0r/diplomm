@@ -1,0 +1,414 @@
+body, h1, h2, h3, p, ul, li, form, input, button {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #fff;
+    color: #333;
+}
+
+.outer-container {
+    width: 100%;
+    display: flex;
+    margin-top: 1%;
+}
+
+.container {
+    width: 50%;
+    margin: 0 auto;
+    margin-left: 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.container h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 50px;
+    margin-top: 50px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.form-group label img {
+    margin-right: 10px;
+}
+
+.keyword-input-container {
+    display: flex;
+    align-items: center;
+}
+
+#keyword-input, #group-input, #exclude-input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+#add-keyword-btn, #add-group-btn, #add-exclude-btn  {
+    padding: 10px 15px;
+    font-size: 1.2rem;
+    color: #fff;
+    background-color: #155F86;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#add-keyword-btn:hover, #add-group-btn:hover, #add-exclude-btn:hover, .save-button:hover {
+    background-color: #007BFF;
+}
+
+#keyword-list, #group-list, #exclude-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+#keyword-list li, #group-list li, #exclude-list li {
+    background-color: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+#keyword-list li button, #group-list li button, #exclude-list li button {
+    margin-left: 10px;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.city-icon {
+    width: 30px;
+    height: 29px;
+    margin-right: 10px;
+}
+
+.keywords-icon {
+    width: 35px;
+    height: 22px;
+    margin-right: 10px;
+}
+
+#id_city {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 10px;
+    height: 50px;
+}
+
+.save-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 1.2rem;
+    transition: background-color 0.3s;
+    color: #fff;
+    background-color: #155F86;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.note {
+    background-color: #e9ecef;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.note h2 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.note ul {
+    list-style-type: decimal;
+    padding-left: 20px;
+}
+
+.note ul li {
+    margin-bottom: 10px;
+}
+
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(38, 38, 38, 0.8);
+    visibility: hidden;
+    z-index: 1000;
+}
+
+.loader-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.robot-box{
+    width: 25%;
+}
+
+.robot {
+    width: 100%;
+    animation: robotMoves 2s ease-in-out alternate infinite;
+}
+
+.robot.second-stage {
+    animation: robotMovesStageTwo 2s ease-in-out alternate infinite;
+}
+
+.robot-arm-left, .robot-arm-right, .gear, .gear-1, .robot-antenna {
+    pointer-events: none;
+}
+
+.gear {
+    transform-box: fill-box;
+    transform-origin: center center;
+    animation: gearhSpin 3s linear infinite;
+}
+
+.gear-1 {
+    display: none;
+    transform-box: fill-box;
+    transform-origin: center center;
+    transform: translate(-20px, 78px);
+}
+
+.robot-eyes > circle {
+    transform-box: fill-box;
+    transform-origin: center center;
+    animation: eyesBlink 2s linear alternate infinite;
+}
+
+.robot.second-stage .robot-eyes {
+    animation: eyesMoves 5s linear alternate infinite;
+}
+
+.robot.second-stage .robot-antenna {
+    animation: antennaMoves 5s linear alternate infinite;
+}
+
+.robot.second-stage .gear {
+    display: none;
+}
+
+.robot.second-stage .gear-1 {
+    display: inline;
+}
+
+.robot.second-stage .robot-arm-right {
+    transform-box: fill-box;
+    transform-origin: center center;
+    transform: rotateY(180deg) rotate(165deg) translate(3px, -35px);
+}
+
+@keyframes robotMoves {
+    from {
+        transform: translateY(0px);
+    }
+    to {
+        transform: translateY(10px);
+    }
+}
+
+@keyframes robotMovesStageTwo {
+    from {
+        transform: translateY(0px);
+    }
+    to {
+        transform: translateY(10px);
+    }
+}
+
+@keyframes gearhSpin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes eyesBlink {
+    10% {
+        transform: scaleY(1);
+    }
+    11% {
+        transform: scaleY(0);
+    }
+    12% {
+        transform: scaleY(0);
+    }
+    13% {
+        transform: scaleY(1);
+    }
+}
+
+@keyframes eyesMoves {
+    10% {
+        transform: translateX(0px);
+    }
+    13% {
+        transform: translateX(-16px);
+    }
+    30% {
+        transform: translateX(-16px);
+    }
+    33% {
+        transform: translateX(16px);
+    }
+    45% {
+        transform: translateX(16px);
+    }
+    47% {
+        transform: translateX(0px);
+    }
+}
+
+@keyframes antennaMoves {
+    10% {
+        transform: translateX(0px);
+    }
+    13% {
+        transform: translateX(2px);
+    }
+    30% {
+        transform: translateX(2px);
+    }
+    33% {
+        transform: translateX(-20px);
+    }
+    45% {
+        transform: translateX(-20px);
+    }
+    47% {
+        transform: translateX(0px);
+    }
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.form-control {
+    width: 400px;
+    height: 50px;
+    padding: 10px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+}
+
+@media (max-width: 768px) {
+    .robot-box {
+        display: none;
+    }
+
+    .navbar {
+        width: calc(100% - 40px);
+    }
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.form-group label img {
+    margin-right: 10px;
+}
+
+.group-icon, .exclude-icon {
+    width: 35px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+#exclude-input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+#exclude-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+#exclude-list li {
+    background-color: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+#exclude-list li button {
+    margin-left: 10px;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#id_excludes {
+    display: none;
+}
