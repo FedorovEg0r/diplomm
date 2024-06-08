@@ -31,17 +31,12 @@ class ParserSetting(models.Model):
     def __str__(self):
         return f"{self.user.username} settings"
 
-class TelegramMessageUser(models.Model):
-    chat_id = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return f"User {self.chat_id}"
 
 class TelegramMessage(models.Model):
     message_id = models.CharField(max_length=255)
     text = models.TextField()
-    user = models.ForeignKey(TelegramMessageUser, on_delete=models.CASCADE, related_name='messages')
+    telegram_profile = models.ForeignKey(TelegramProfile, on_delete=models.CASCADE, related_name='messages')
     button_id = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return f"Message {self.message_id} from user {self.user.chat_id}"
+        return f"Message {self.message_id} from user {self.telegram_profile.chat_id}"

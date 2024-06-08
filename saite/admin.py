@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import City, TelegramGroup
-from .models import News
+from .models import News, AdPost, City, TelegramGroup
 
 
 class TelegramGroupInline(admin.TabularInline):
@@ -27,3 +26,9 @@ class NewsAdmin(admin.ModelAdmin):
     list_display = ('title', 'created_at')
     search_fields = ('title', 'content')
     list_filter = ('created_at',)
+
+
+@admin.register(AdPost)
+class AdPostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'content')
+    search_fields = ('title',)

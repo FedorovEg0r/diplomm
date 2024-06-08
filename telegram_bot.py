@@ -1,25 +1,28 @@
 import os
 import django
+import re
 import asyncio
-
-# Настройка переменной окружения для загрузки настроек Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'diplom.settings')
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-django.setup()
-
 from telethon import TelegramClient, events
 from telethon.errors import RpcCallFailError, FloodWaitError, UsernameNotOccupiedError, ChannelPrivateError
-from telethon.tl.types import MessageMediaPhoto, MessageMediaDocument, Channel
+from telethon.tl.types import MessageMediaPhoto, MessageMediaDocument, Channel, MessageMediaWebPage
 from telethon.tl.functions.channels import JoinChannelRequest, LeaveChannelRequest
 from telethon.tl.functions.contacts import ResolveUsernameRequest
 from datetime import datetime, timezone
 import telebot
+from telebot.apihelper import ApiTelegramException
 from telebot import types
 import urllib.parse
 import shortuuid
 from aiogram.enums import ParseMode
-from saite.models import TelegramGroup
-from telegram_auth.models import TelegramProfile, ParserSetting, User, TelegramMessage, TelegramMessageUser
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'diplom.settings')
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+django.setup()
+
+from saite.models import TelegramGroup, AdPost
+from telegram_auth.models import TelegramProfile, ParserSetting, User, TelegramMessage
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 api_id = 24503676
 api_hash = '0423f4e40d705df79f59c74e2fc67276'
@@ -34,9 +37,6 @@ async def is_recent_message(message):
     date = message.date.replace(tzinfo=timezone.utc)
     time_difference = (now - date).total_seconds()
     return time_difference < 30
-
-
-
 
 
 async def join_channels():
@@ -75,7 +75,8 @@ def handle_invalid_channel(tag):
                 user = User.objects.get(id=user_id)
                 chat_id = user.telegram_profile.chat_id
                 bot.send_message(chat_id,
-                                 f"Канал с тегом {tag} был удален из ваших настроек, т. к. не существует или недоступен для входа.")
+                                 f"Канал с тегом {tag} был удален из ваших настроек, т. к. не существует или "
+                                 f"недоступен для входа.")
 
                 parser_setting = ParserSetting.objects.get(user_id=user_id)
                 groups = parser_setting.groups.split(',')
@@ -103,10 +104,37 @@ async def leave_channel(tag):
         await client(LeaveChannelRequest(await client.get_input_entity(tag)))
 
 
+async def send_media_message(telegram_bot, chat_id, event, text_msg, keyboard):
+    media = event.message.media
+    if isinstance(media, MessageMediaPhoto):
+        file_path = await event.message.download_media()
+        with open(file_path, 'rb') as photo:
+            telegram_bot.send_photo(chat_id, photo, caption=text_msg, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+        os.remove(file_path)
+    elif isinstance(media, MessageMediaDocument):
+        file_path = await event.message.download_media()
+        if media.document.mime_type.startswith('audio'):
+            with open(file_path, 'rb') as audio:
+                telegram_bot.send_audio(chat_id, audio, caption=text_msg, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+        elif media.document.mime_type.startswith('video'):
+            with open(file_path, 'rb') as video:
+                telegram_bot.send_video(chat_id, video, caption=text_msg, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+        else:
+            with open(file_path, 'rb') as document:
+                telegram_bot.send_document(chat_id, document, caption=text_msg, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+        os.remove(file_path)
+    elif isinstance(media, MessageMediaWebPage):
+        telegram_bot.send_message(chat_id, text_msg, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+    else:
+        telegram_bot.send_message(chat_id, text_msg, reply_markup=keyboard, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
+
+
+
 async def normal_handler(event):
     if not await is_recent_message(event.message):
         return
     msg = event.message.message
+
     chan_tag = event.chat.username
     chan_tag_full = '@' + chan_tag
     media = event.message.media
@@ -117,68 +145,68 @@ async def normal_handler(event):
     except TelegramGroup.DoesNotExist:
         return
 
-    users_with_city = ParserSetting.objects.filter(city=telegram_group.city, city__isnull=False).values_list('user', flat=True)
-    users_with_custom_group = ParserSetting.objects.filter(groups__icontains=chan_tag_full).values_list('user', flat=True)
+    users_with_city = ParserSetting.objects.filter(city=telegram_group.city, city__isnull=False).values_list('user',
+                                                                                                             flat=True)
+    users_with_custom_group = ParserSetting.objects.filter(groups__icontains=chan_tag_full).values_list('user',
+                                                                                                        flat=True)
     all_users = set(users_with_city) | set(users_with_custom_group)
+
+    message_link = f"https://t.me/{chan_tag}/{event.message.id}"
 
     for user_id in all_users:
         try:
-            parser = ParserSetting.objects.get(user_id=user_id)
-        except ParserSetting.DoesNotExist:
+            telegram_profile = TelegramProfile.objects.get(user_id=user_id)
+        except TelegramProfile.DoesNotExist:
             continue
 
+        parser = ParserSetting.objects.get(user_id=user_id)
         keywords = parser.keywords.split(',')
         excludes = parser.excludes.split(',') if parser.excludes else []
 
-        found_keywords = [word.strip() for word in keywords if word.strip().casefold() in msg.casefold()]
-        found_excludes = [word.strip() for word in excludes if word.strip().casefold() in msg.casefold()]
+        found_keywords = [word.strip() for word in keywords if
+                          re.search(r'\b' + re.escape(word.strip()) + r'\b', msg, re.IGNORECASE)]
+        found_excludes = [word.strip() for word in excludes if
+                          re.search(r'\b' + re.escape(word.strip()) + r'\b', msg, re.IGNORECASE)]
 
         if found_keywords and not found_excludes:
-            keywords_str = ', '.join(found_keywords)
-            text_msg = (f"Сообщение из канала {telegram_group.group_tag}:\n\n{msg}\n\n"
-                        f"Найдено по ключевым словам: {keywords_str}\n")
-            chat_id = parser.user.telegram_profile.chat_id
+            # keywords_str = ', '.join(found_keywords)
+            text_msg = (f"Из канала {telegram_group.group_tag}:\n\n{msg}\n\n"
+                        # f"Найдено по ключевым словам: {keywords_str}\n\n"
+                        f"<a href='{message_link}'><b>Ссылка на сообщение</b></a>")
+            chat_id = telegram_profile.chat_id
+
+            button_id = shortuuid.ShortUUID().random(length=8)
+            calendar_button = types.InlineKeyboardButton(
+                'Добавить событие в Google Календарь',
+                callback_data=f'add_event_to_google_calendar:{button_id}'
+            )
+            keyboard = types.InlineKeyboardMarkup()
+            keyboard.add(calendar_button)
+
+            TelegramMessage.objects.create(
+                telegram_profile=telegram_profile,
+                message_id=event.message.id,
+                text=msg,
+                button_id=button_id
+            )
 
             try:
-                button_id = shortuuid.ShortUUID().random(length=8)
-                calendar_button = types.InlineKeyboardButton(
-                    'Добавить событие в Google Календарь',
-                    callback_data=f'add_event_to_google_calendar:{button_id}'
-                )
-                keyboard = types.InlineKeyboardMarkup()
-                keyboard.add(calendar_button)
-
-                user, created = TelegramMessageUser.objects.get_or_create(chat_id=chat_id)
-                TelegramMessage.objects.create(user=user, message_id=event.message.id, text=msg, button_id=button_id)
-
-                if media:
-                    if isinstance(media, MessageMediaPhoto):
-                        file_path = await event.message.download_media()
-                        with open(file_path, 'rb') as photo:
-                            bot.send_photo(chat_id, photo, caption=text_msg, reply_markup=keyboard)
-                        os.remove(file_path)
-                    elif isinstance(media, MessageMediaDocument):
-                        file_path = await event.message.download_media()
-                        with open(file_path, 'rb') as video:
-                            bot.send_video(chat_id, video, caption=text_msg, reply_markup=keyboard)
-                        os.remove(file_path)
-                else:
-                    bot.send_message(chat_id, text_msg, reply_markup=keyboard)
+                await send_media_message(bot, chat_id, event, text_msg, keyboard)
             except FloodWaitError as e:
                 await asyncio.sleep(e.seconds + 1)
-                if media:
-                    if isinstance(media, MessageMediaPhoto):
-                        file_path = await event.message.download_media()
-                        with open(file_path, 'rb') as photo:
-                            bot.send_photo(chat_id, photo, caption=text_msg, reply_markup=keyboard)
-                        os.remove(file_path)
-                    elif isinstance(media, MessageMediaDocument):
-                        file_path = await event.message.download_media()
-                        with open(file_path, 'rb') as video:
-                            bot.send_video(chat_id, video, caption=text_msg, reply_markup=keyboard)
-                        os.remove(file_path)
-                else:
-                    bot.send_message(chat_id, text_msg, reply_markup=keyboard, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
+                await send_media_message(bot, chat_id, event, text_msg, keyboard)
+            except ApiTelegramException as e:
+                if "message caption is too long" in str(e):
+                    msg = msg[:-(56 + len(telegram_group.group_tag))] + "\n<b><i>(продолжение в посте)</i></b>"
+
+                    text_msg = (f"Из канала {telegram_group.group_tag}:\n\n{msg}\n\n"
+                                # f"Найдено по ключевым словам: {keywords_str}\n\n"
+                                f"<a href='{message_link}'><b>Ссылка на сообщение</b></a>")
+                    try:
+                        await send_media_message(bot, chat_id, event, text_msg, keyboard)
+                    except FloodWaitError as e:
+                        await asyncio.sleep(e.seconds + 1)
+                        await send_media_message(bot, chat_id, event, text_msg, keyboard)
 
 
 async def check_new_groups():
@@ -197,7 +225,6 @@ async def check_new_groups():
                     try:
                         await join_channel(tag)
                     except FloodWaitError as e:
-                        print(f"Flood wait error for joining channel {tag}. Waiting for {e.seconds} seconds.")
                         await asyncio.sleep(e.seconds + 1)
                         await join_channel(tag)
 
@@ -205,7 +232,6 @@ async def check_new_groups():
                     try:
                         await leave_channel(tag)
                     except FloodWaitError as e:
-                        print(f"Flood wait error for leaving channel {tag}. Waiting for {e.seconds} seconds.")
                         await asyncio.sleep(e.seconds + 1)
                         await leave_channel(tag)
 

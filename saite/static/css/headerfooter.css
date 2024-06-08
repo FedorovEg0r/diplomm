@@ -44,7 +44,7 @@ header.shadow {
 }
 
 .custom-button:hover {
-    background-color: #124f70;
+    background-color: #007BFF;
 }
 
 .icon-container {
@@ -120,10 +120,17 @@ header.shadow {
     color: #fff;
     transition: background-color 0.3s;
     text-decoration: none;
-    background-color: #007BFF;
     padding: 5px 10px;
     border-radius: 5px;
     margin-left: 10px;
+}
+
+.custom-button2 {
+    background-color: #007BFF;
+}
+
+.custom-button {
+    background-color: #155F86;
 }
 
 .custom-button .icon-container, .custom-button2 .icon-container {

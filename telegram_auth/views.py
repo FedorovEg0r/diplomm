@@ -10,13 +10,16 @@ from django.apps import AppConfig
 from django.core.signals import request_started
 from django.contrib.auth import login
 from django.shortcuts import redirect
-from .models import TelegramProfile, UserLogin, ParserSetting, TelegramMessage, TelegramMessageUser
-from saite.models import City, TelegramGroup
+from .models import TelegramProfile, UserLogin, ParserSetting, TelegramMessage
+from saite.models import City, TelegramGroup, AdPost
 from django.contrib.auth.models import User
 import secrets
-from django.dispatch import receiver
 from django.contrib.auth import logout
 from urllib.parse import urlencode
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
 
 
 
@@ -46,9 +49,27 @@ def set_webhook(**kwargs):
         logger.error("Error setting webhook: %s", e)
 
 
+@receiver(post_save, sender=AdPost)
+def send_adpost_notification(sender, instance, created, **kwargs):
+    if created:
+        send_adpost_to_users(instance)
+
+
+def send_adpost_to_users(ad):
+    all_users = ParserSetting.objects.values_list('user', flat=True)
+    text_msg = f"{ad.title}\n\n{ad.content}\n\n<i>реклама</i>"
+    for user_id in all_users:
+        try:
+            telegram_profile = TelegramProfile.objects.get(user_id=user_id)
+        except TelegramProfile.DoesNotExist:
+            continue
+        chat_id = telegram_profile.chat_id
+        send_telegram_message_with_html(chat_id, text_msg)
+
+
 TELEGRAM_API = 'https://api.telegram.org/bot'
 TELEGRAM_TOKEN = '6794656536:AAHRrqdax_iANoWmeAeMbX6C_YomWgWxsDw'
-WEBHOOK_URL = 'https://3194-178-76-218-138.ngrok-free.app/telegram-webhook'
+WEBHOOK_URL = 'https://af14-178-155-5-19.ngrok-free.app/telegram-webhook'
 BASE_URL = WEBHOOK_URL.rsplit('/', 1)[0]
 
 
@@ -56,6 +77,7 @@ def send_telegram_message(chat_id, text):
     send_url = f'{TELEGRAM_API}{TELEGRAM_TOKEN}/sendMessage'
     response = requests.post(send_url, data={'chat_id': chat_id, 'text': text})
     logger.info(f"Message send attempt to chat_id {chat_id} with response: {response.json()}")
+
 
 def send_telegram_message_with_html(chat_id, text):
     send_url = f'{TELEGRAM_API}{TELEGRAM_TOKEN}/sendMessage'
@@ -162,16 +184,17 @@ def update_parser_settings(request):
             if group.users.count() == 0 and group.city is None:
                 group.delete()
 
-    message = "Настройки парсера обновлены."
+    message = "Настройки парсера обновлены.\n"
     if custom_settings:
-        message += f" Ключевые слова: {keywords}, исключающие слова: {excludes}, группы: {groups}."
+        message += f"Группы: {groups}\nКлючевые слова: {keywords}\nИсключающие слова: {excludes}"
     else:
-        message += f" Город: {city.name}, ключевые слова: {keywords}, исключающие слова: {excludes}."
+        message += f"Город: {city.name}\nКлючевые слова: {keywords}\nИсключающие слова: {excludes}"
 
     telegram_profile = TelegramProfile.objects.get(user=user)
     send_telegram_message(telegram_profile.chat_id, message)
 
     return JsonResponse({'status': 'success', 'message': message})
+
 
 def analyze_event_with_yandex(event_details):
     event_details = " ".join(event_details.split())
@@ -237,7 +260,6 @@ def create_google_calendar_link(event_details):
     return f"https://www.google.com/calendar/render?{urlencode(query)}"
 
 
-
 @csrf_exempt
 def telegram_webhook(request):
     if request.method == 'POST':
@@ -275,26 +297,26 @@ def telegram_webhook(request):
             if callback_data.startswith('add_event_to_google_calendar:'):
                 button_id = callback_data.split(':')[1]
                 telegram_message = TelegramMessage.objects.get(button_id=button_id)
-                user = telegram_message.user
+                telegram_profile = telegram_message.telegram_profile
                 message_id = telegram_message.message_id
                 message_text = telegram_message.text
-                chat_id = user.chat_id
+                chat_id = telegram_profile.chat_id
 
                 # Анализируем событие с помощью Yandex API
                 event_details = " ".join(message_text.split())
                 analysis_result = analyze_event_with_yandex(event_details)
                 calendar_link = create_google_calendar_link(analysis_result)
                 add_to_calendar_text = f'<a href="{calendar_link}">Добавить</a>'
-                send_telegram_message_with_html(chat_id, f'Анализ события:\n{analysis_result}\n\nДобавить в Google Календарь: {add_to_calendar_text}')
+                send_telegram_message_with_html(chat_id,
+                                                f'Анализ события:\n{analysis_result}\n\nДобавить в Google Календарь: {add_to_calendar_text}')
 
+                telegram_message.delete()
 
                 return JsonResponse({'status': 'success'})
 
         return JsonResponse({})
     else:
         return HttpResponseNotAllowed(['POST'])
-
-
 
 
 def login_by_token(request):

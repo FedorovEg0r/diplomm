@@ -138,4 +138,4 @@ CKEDITOR_5_CONFIGS = {
 
 CKEDITOR_5_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-CSRF_TRUSTED_ORIGINS = ["https://3194-178-76-218-138.ngrok-free.app"]
+CSRF_TRUSTED_ORIGINS = ["https://af14-178-155-5-19.ngrok-free.app"]

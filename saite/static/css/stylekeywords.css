@@ -77,11 +77,35 @@ body {
     background-color: #007BFF;
 }
 
-#keyword-list, #group-list, #exclude-list {
-    list-style-type: none;
-    padding-left: 0;
-    margin-top: 10px;
+#keyword-list li, #group-list li, #exclude-list li {
+    background-color: #155F86;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    overflow: hidden; /* Скрытие переполнения текста */
+    white-space: nowrap; /* Запрет переноса текста */
+    text-overflow: ellipsis; /* Добавление многоточия для переполненного текста */
+    vertical-align: top; /* Выравнивание по верхнему краю */
 }
+
+#show-groups-btn, #hide-groups-btn, #show-keywords-btn, #hide-keywords-btn, #show-excludes-btn, #hide-excludes-btn {
+    display: none;
+    padding: 5px 10px;
+    margin: 5px 0;
+    background-color: #155F86;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#show-groups-btn:hover, #hide-groups-btn:hover, #show-keywords-btn:hover, #hide-keywords-btn:hover, #show-excludes-btn:hover, #hide-excludes-btn:hover {
+    background-color: #007BFF;
+}
+
 
 #keyword-list li, #group-list li, #exclude-list li {
     background-color: #e9ecef;
@@ -409,6 +433,74 @@ body {
     border-radius: 4px;
     cursor: pointer;
 }
+
 #id_excludes {
     display: none;
+}
+
+.action-button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: #0056b3;
+}
+
+.clear-button {
+    background-color: #dc3545;
+}
+
+.clear-button:hover {
+    background-color: #c82333;
+}
+
+.copy-button {
+    background-color: #28a745;
+}
+
+.copy-button:hover {
+    background-color: #218838;
+}
+
+.action-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.action-button:focus {
+    outline: none;
+}
+#clear-keywords-btn, #copy-keywords-btn, #copy-excludes-btn, #clear-excludes-btn, #copy-groups-btn, #clear-groups-btn {
+    padding: 1px 13px;
+    background-color: #e9ecef;
+    border-radius: 6px;
+    border: none;
+    margin-top: 5px;
+    color: #495057;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+#clear-keywords-btn:hover, #copy-keywords-btn:hover, #copy-excludes-btn:hover, #clear-excludes-btn:hover, #copy-groups-btn:hover, #clear-groups-btn:hover{
+    background-color: #d6d9dcd1;
+    cursor: pointer;
+}
+.keyword-action-buttons{
+    margin-bottom: 20px;
+}
+.warning-message{
+    color: red;
 }

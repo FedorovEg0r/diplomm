@@ -32,6 +32,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const excludesField = document.getElementById('id_excludes');
     const existingExclude = "{{ excludes|escapejs }}".split(',');
 
+    const clearGroupsBtn = document.getElementById('clear-groups-btn');
+    const copyGroupsBtn = document.getElementById('copy-groups-btn');
+    const clearKeywordsBtn = document.getElementById('clear-keywords-btn');
+    const copyKeywordsBtn = document.getElementById('copy-keywords-btn');
+    const clearExcludesBtn = document.getElementById('clear-excludes-btn');
+    const copyExcludesBtn = document.getElementById('copy-excludes-btn');
+    const customSettingsWarning = document.getElementById('custom-settings-warning');
+
+    const showGroupsBtn = document.getElementById('show-groups-btn');
+    const hideGroupsBtn = document.getElementById('hide-groups-btn');
+    const showKeywordsBtn = document.getElementById('show-keywords-btn');
+    const hideKeywordsBtn = document.getElementById('hide-keywords-btn');
+    const showExcludesBtn = document.getElementById('show-excludes-btn');
+    const hideExcludesBtn = document.getElementById('hide-excludes-btn');
+
     customSettingsCheckbox.addEventListener('change', function() {
         if (customSettingsCheckbox.checked) {
             citySelection.style.display = 'none';
@@ -41,7 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
             customSettings.style.display = 'none';
         }
     });
+
     loader.style.visibility = 'hidden';
+
     // Groups
     existingGroups.forEach(group => {
         if (group.trim()) {
@@ -50,18 +67,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     addGroupBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const group = groupInput.value.trim();
+    e.preventDefault();
+    const groups = parseInput(groupInput.value, true);
+    groups.forEach(group => {
         if (/[А-Яа-яЁё]/.test(group)) {
             groupWarning.style.display = 'block';
         } else {
             groupWarning.style.display = 'none';
-            if (group) {
+            if (group && !isInList(group, groupList)) {
                 addGroupToList(group);
-                groupInput.value = '';
             }
         }
     });
+    groupInput.value = '';
+});
 
     groupInput.addEventListener('input', function() {
         const value = groupInput.value.trim();
@@ -72,7 +91,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function addGroupToList(group) {
+    groupInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const groups = parseInput(groupInput.value, true);
+        groups.forEach(group => {
+            if (/[А-Яа-яЁё]/.test(group)) {
+                groupWarning.style.display = 'block';
+            } else {
+                groupWarning.style.display = 'none';
+                if (group && !isInList(group, groupList)) {
+                    addGroupToList(group);
+                }
+            }
+        });
+        groupInput.value = '';
+    }
+});
+
+function addGroupToList(group) {
+    if (!group.startsWith('@')) {
+        group = '@' + group;
+    }
+    if (group.length > 1) { // Проверка на пустое значение с @
         const li = document.createElement('li');
         li.textContent = formatKeyword(group);
         const removeBtn = document.createElement('button');
@@ -86,11 +127,59 @@ document.addEventListener('DOMContentLoaded', function() {
         groupList.appendChild(li);
         updateGroupsField();
     }
+}
 
     function updateGroupsField() {
         const groups = Array.from(groupList.children).map(li => li.firstChild.textContent.replace('...', ''));
         groupsField.value = groups.join(',');
+        toggleGroupButtons();
     }
+
+    function toggleGroupButtons() {
+        if (groupList.children.length > 20) {
+            showGroupsBtn.style.display = 'inline-block';
+            hideGroupsBtn.style.display = 'none';
+            Array.from(groupList.children).forEach((li, index) => {
+                li.style.display = index < 20 ? 'inline-block' : 'none';
+            });
+        } else {
+            showGroupsBtn.style.display = 'none';
+            hideGroupsBtn.style.display = 'none';
+            Array.from(groupList.children).forEach(li => {
+                li.style.display = 'inline-block';
+            });
+        }
+    }
+
+    showGroupsBtn.addEventListener('click', function() {
+        Array.from(groupList.children).forEach(li => {
+            li.style.display = 'inline-block';
+        });
+        showGroupsBtn.style.display = 'none';
+        hideGroupsBtn.style.display = 'inline-block';
+    });
+
+    hideGroupsBtn.addEventListener('click', function() {
+        Array.from(groupList.children).forEach((li, index) => {
+            li.style.display = index < 20 ? 'inline-block' : 'none';
+        });
+        showGroupsBtn.style.display = 'inline-block';
+        hideGroupsBtn.style.display = 'none';
+    });
+
+    clearGroupsBtn.addEventListener('click', function() {
+        groupList.innerHTML = '';
+        updateGroupsField();
+    });
+
+    copyGroupsBtn.addEventListener('click', function() {
+        const groups = Array.from(groupList.children).map(li => li.firstChild.textContent.replace('...', ''));
+        navigator.clipboard.writeText(groups.join(', ')).then(() => {
+
+        }).catch(err => {
+
+        });
+    });
 
     // Keywords
     existingKeywords.forEach(keyword => {
@@ -100,15 +189,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     addKeywordBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const keyword = keywordInput.value.trim();
-        if (keyword) {
+    e.preventDefault();
+    const keywords = parseInput(keywordInput.value);
+    keywords.forEach(keyword => {
+        if (keyword && !isInList(keyword, keywordList)) {
             addKeywordToList(keyword);
-            keywordInput.value = '';
         }
     });
+    keywordInput.value = '';
+});
 
-    function addKeywordToList(keyword) {
+    keywordInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const keywords = parseInput(keywordInput.value);
+        keywords.forEach(keyword => {
+            if (keyword && !isInList(keyword, keywordList)) {
+                addKeywordToList(keyword);
+            }
+        });
+        keywordInput.value = '';
+    }
+});
+
+function addKeywordToList(keyword) {
+    if (!isInList(keyword, keywordList)) {
         const li = document.createElement('li');
         li.textContent = formatKeyword(keyword);
         const removeBtn = document.createElement('button');
@@ -122,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         keywordList.appendChild(li);
         updateKeywordsField();
     }
+}
 
     function formatKeyword(keyword) {
         return keyword.length > 20 ? keyword.substring(0, 20) + '...' : keyword;
@@ -130,7 +236,54 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateKeywordsField() {
         const keywords = Array.from(keywordList.children).map(li => li.firstChild.textContent.replace('...', ''));
         keywordsField.value = keywords.join(',');
+        toggleKeywordButtons();
     }
+
+    function toggleKeywordButtons() {
+        if (keywordList.children.length > 20) {
+            showKeywordsBtn.style.display = 'inline-block';
+            hideKeywordsBtn.style.display = 'none';
+            Array.from(keywordList.children).forEach((li, index) => {
+                li.style.display = index < 20 ? 'inline-block' : 'none';
+            });
+        } else {
+            showKeywordsBtn.style.display = 'none';
+            hideKeywordsBtn.style.display = 'none';
+            Array.from(keywordList.children).forEach(li => {
+                li.style.display = 'inline-block';
+            });
+        }
+    }
+
+    showKeywordsBtn.addEventListener('click', function() {
+        Array.from(keywordList.children).forEach(li => {
+            li.style.display = 'inline-block';
+        });
+        showKeywordsBtn.style.display = 'none';
+        hideKeywordsBtn.style.display = 'inline-block';
+    });
+
+    hideKeywordsBtn.addEventListener('click', function() {
+        Array.from(keywordList.children).forEach((li, index) => {
+            li.style.display = index < 20 ? 'inline-block' : 'none';
+        });
+        showKeywordsBtn.style.display = 'inline-block';
+        hideKeywordsBtn.style.display = 'none';
+    });
+
+    clearKeywordsBtn.addEventListener('click', function() {
+        keywordList.innerHTML = '';
+        updateKeywordsField();
+    });
+
+    copyKeywordsBtn.addEventListener('click', function() {
+        const keywords = Array.from(keywordList.children).map(li => li.firstChild.textContent.replace('...', ''));
+        navigator.clipboard.writeText(keywords.join(', ')).then(() => {
+
+        }).catch(err => {
+
+        });
+    });
 
     // Excludes
     existingExclude.forEach(exclude => {
@@ -140,26 +293,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     addExcludeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const exclude = excludeInput.value.trim();
-        if (exclude) {
+    e.preventDefault();
+    const excludes = parseInput(excludeInput.value);
+    excludes.forEach(exclude => {
+        if (exclude && !isInList(exclude, excludeList)) {
             addExcludeToList(exclude);
-            excludeInput.value = '';
         }
     });
+    excludeInput.value = '';
+});
 
     excludeInput.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            const exclude = excludeInput.value.trim();
-            if (exclude) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const excludes = parseInput(excludeInput.value);
+        excludes.forEach(exclude => {
+            if (exclude && !isInList(exclude, excludeList)) {
                 addExcludeToList(exclude);
-                excludeInput.value = '';
             }
-        }
-    });
+        });
+        excludeInput.value = '';
+    }
+});
 
-    function addExcludeToList(exclude) {
+function addExcludeToList(exclude) {
+    if (!isInList(exclude, excludeList)) {
         const li = document.createElement('li');
         li.textContent = formatKeyword(exclude);
         const removeBtn = document.createElement('button');
@@ -173,11 +331,60 @@ document.addEventListener('DOMContentLoaded', function() {
         excludeList.appendChild(li);
         updateExcludesField();
     }
+}
 
     function updateExcludesField() {
         const excludes = Array.from(excludeList.children).map(li => li.firstChild.textContent.replace('...', ''));
         excludesField.value = excludes.join(',');
+        toggleExcludeButtons();
     }
+
+    function toggleExcludeButtons() {
+        if (excludeList.children.length > 20) {
+            showExcludesBtn.style.display = 'inline-block';
+            hideExcludesBtn.style.display = 'none';
+            Array.from(excludeList.children).forEach((li, index) => {
+                li.style.display = index < 20 ? 'inline-block' : 'none';
+            });
+        } else {
+            showExcludesBtn.style.display = 'none';
+            hideExcludesBtn.style.display = 'none';
+            Array.from(excludeList.children).forEach(li => {
+                li.style.display = 'inline-block';
+            });
+        }
+    }
+
+    showExcludesBtn.addEventListener('click', function() {
+        Array.from(excludeList.children).forEach(li => {
+            li.style.display = 'inline-block';
+        });
+        showExcludesBtn.style.display = 'none';
+        hideExcludesBtn.style.display = 'inline-block';
+    });
+
+    hideExcludesBtn.addEventListener('click', function() {
+        Array.from(excludeList.children).forEach((li, index) => {
+            li.style.display = index < 20 ? 'inline-block' : 'none';
+        });
+        showExcludesBtn.style.display = 'inline-block';
+        hideExcludesBtn.style.display = 'none';
+    });
+
+
+    clearExcludesBtn.addEventListener('click', function() {
+        excludeList.innerHTML = '';
+        updateExcludesField();
+    });
+
+    copyExcludesBtn.addEventListener('click', function() {
+        const excludes = Array.from(excludeList.children).map(li => li.firstChild.textContent.replace('...', ''));
+        navigator.clipboard.writeText(excludes.join(', ')).then(() => {
+
+        }).catch(err => {
+
+        });
+    });
 
     document.querySelector('form').addEventListener('submit', function(event) {
         if (!customSettingsCheckbox.checked && !document.getElementById('id_city').value) {
@@ -188,13 +395,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (customSettingsCheckbox.checked && groupList.children.length === 0) {
             event.preventDefault();
-            alert('Пожалуйста, добавьте хотя бы одну группу для продвинутых настроек.');
+            customSettingsWarning.style.display = 'block';
             return;
         }
 
         document.getElementById('loader').style.visibility = 'visible';
     });
+    document.addEventListener('click', function() {
+        customSettingsWarning.style.display = 'none';
+    });
 
+    groupInput.addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
     const robot = document.querySelector('.robot');
     keywordInput.addEventListener('input', function() {
         if (keywordInput.value.trim() !== "") {
@@ -207,6 +420,34 @@ document.addEventListener('DOMContentLoaded', function() {
     addKeywordBtn.addEventListener('click', function() {
         robot.classList.remove('second-stage');
     });
+
+function parseInput(input, forGroups = false) {
+    input = input.replace(/\s*,\s*/g, ','); // Убираем пробелы вокруг символа ","
+    input = input.replace(/\s*\|\s*/g, '|'); // Убираем пробелы вокруг символа "|"
+    let words = input.split(/[|,]+/).map(word => word.trim()); // Разделяем по символам "|" и ","
+    words = words.flatMap(word => {
+        if (word.includes('"')) {
+            return word.split(/["]+/).filter(Boolean); // Убираем кавычки
+        }
+        return [word];
+    });
+    words = words.filter(word => word.length > 1 || !/^[^\w\sА-Яа-яЁё]+$/.test(word)); // Убираем слова, состоящие только из неалфавитных символов, кроме русских
+    words = words.map(word => word.replace(/^[^\wА-Яа-яЁё]+|[^\wА-Яа-яЁё]+$/g, '').trim()); // Убираем любые неалфавитные символы в начале и конце, кроме русских
+    if (forGroups) {
+        words = words.map(word => {
+            if (!word.startsWith('@')) {
+                return '@' + word.replace(/\s+/g, '_'); // Заменяем пробелы на подчеркивания
+            }
+            return word.replace(/\s+/g, '_'); // Заменяем пробелы на подчеркивания
+        });
+    }
+    return words.filter(word => word); // Убираем пустые строки
+}
+
+    function isInList(word, list) {
+        const items = Array.from(list.children).map(li => li.firstChild.textContent.replace('...', ''));
+        return items.includes(word);
+    }
 });
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -221,6 +462,9 @@ document.addEventListener('DOMContentLoaded', function() {
         citySelect.selectedIndex = 0;
     }
 });
+
+
+
 </script>
 </head>
 <body>
@@ -256,6 +500,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="warning-message" id="group-warning" style="display: none;">
                                     Пожалуйста, вводите группы на английском языке.
                                 </div>
+                                <div class="warning-message" id="custom-settings-warning" style="display: none;">
+                                    Пожалуйста, добавьте хотя бы одну группу.
+                                </div>
+                                <div class="keyword-action-buttons">
+                                    <button type="button" id="clear-groups-btn">Удалить всё</button>
+                                    <button type="button" id="copy-groups-btn">Скопировать</button>
+                                    <button type="button" id="show-groups-btn" style="display: none;">Показать все</button>
+                                    <button type="button" id="hide-groups-btn" style="display: none;">Скрыть</button>
+                                </div>
                                 <ul id="group-list"></ul>
                                 {{ form.groups }}
                             </div>
@@ -266,6 +519,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <input type="text" id="keyword-input" placeholder="Введите ключевое слово">
                                 <button id="add-keyword-btn">+</button>
                             </div>
+                            <div class="keyword-action-buttons">
+                                <button type="button" id="clear-keywords-btn">Удалить всё</button>
+                                <button type="button" id="copy-keywords-btn">Скопировать</button>
+                                <button type="button" id="show-keywords-btn" style="display: none;">Показать все</button>
+                                <button type="button" id="hide-keywords-btn" style="display: none;">Скрыть</button>
+                            </div>
                             <ul id="keyword-list"></ul>
                             {{ form.keywords }}
                         </div>
@@ -274,6 +533,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="keyword-input-container">
                                 <input type="text" id="exclude-input" placeholder="Введите исключающее слово">
                                 <button id="add-exclude-btn">+</button>
+                            </div>
+                            <div class="keyword-action-buttons">
+                                <button type="button" id="clear-excludes-btn">Удалить всё</button>
+                                <button type="button" id="copy-excludes-btn">Скопировать</button>
+                                <button type="button" id="show-excludes-btn" style="display: none;">Показать все</button>
+                                <button type="button" id="hide-excludes-btn" style="display: none;">Скрыть</button>
                             </div>
                             <ul id="exclude-list"></ul>
                             {{ form.excludes }}
