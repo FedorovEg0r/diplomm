@@ -69,7 +69,7 @@ def send_adpost_to_users(ad):
 
 TELEGRAM_API = 'https://api.telegram.org/bot'
 TELEGRAM_TOKEN = '6794656536:AAHRrqdax_iANoWmeAeMbX6C_YomWgWxsDw'
-WEBHOOK_URL = 'https://af14-178-155-5-19.ngrok-free.app/telegram-webhook'
+WEBHOOK_URL = 'https://57b1-85-249-163-148.ngrok-free.app/telegram-webhook'
 BASE_URL = WEBHOOK_URL.rsplit('/', 1)[0]
 
 

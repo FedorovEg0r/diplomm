@@ -20,10 +20,5 @@ class Migration(migrations.Migration):
             model_name='parsersetting',
             name='keywords',
         ),
-        migrations.AddField(
-            model_name='parsersetting',
-            name='parser',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='parser_settings', to='saite.parser'),
-            preserve_default=False,
-        ),
+
     ]

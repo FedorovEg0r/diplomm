@@ -1,10 +1,8 @@
-
 from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -16,7 +14,6 @@ SECRET_KEY = 'django-insecure-%m&+sp%9&p*g3*0u$hc&m%flg#^$t0sf8+-jz+ijh4i0=l9-b$
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -66,17 +63,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'diplom.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'afisha',  # database name eg-django
+        'USER': 'root',  # username as root
+        'PASSWORD': '',  # password keep empty
+        'HOST': 'localhost',  # host is localhost
+        'PORT': '3306',  # you can find port in xampp control panel(mysql)
+        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -95,7 +95,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -138,4 +137,4 @@ CKEDITOR_5_CONFIGS = {
 
 CKEDITOR_5_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-CSRF_TRUSTED_ORIGINS = ["https://af14-178-155-5-19.ngrok-free.app"]
+CSRF_TRUSTED_ORIGINS = ["https://57b1-85-249-163-148.ngrok-free.app"]

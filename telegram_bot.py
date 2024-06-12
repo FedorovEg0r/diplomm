@@ -115,19 +115,22 @@ async def send_media_message(telegram_bot, chat_id, event, text_msg, keyboard):
         file_path = await event.message.download_media()
         if media.document.mime_type.startswith('audio'):
             with open(file_path, 'rb') as audio:
-                telegram_bot.send_audio(chat_id, audio, caption=text_msg, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+                telegram_bot.send_audio(chat_id, audio, caption=text_msg, reply_markup=keyboard,
+                                        parse_mode=ParseMode.HTML)
         elif media.document.mime_type.startswith('video'):
             with open(file_path, 'rb') as video:
-                telegram_bot.send_video(chat_id, video, caption=text_msg, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+                telegram_bot.send_video(chat_id, video, caption=text_msg, reply_markup=keyboard,
+                                        parse_mode=ParseMode.HTML)
         else:
             with open(file_path, 'rb') as document:
-                telegram_bot.send_document(chat_id, document, caption=text_msg, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+                telegram_bot.send_document(chat_id, document, caption=text_msg, reply_markup=keyboard,
+                                           parse_mode=ParseMode.HTML)
         os.remove(file_path)
     elif isinstance(media, MessageMediaWebPage):
         telegram_bot.send_message(chat_id, text_msg, reply_markup=keyboard, parse_mode=ParseMode.HTML)
     else:
-        telegram_bot.send_message(chat_id, text_msg, reply_markup=keyboard, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
-
+        telegram_bot.send_message(chat_id, text_msg, reply_markup=keyboard, disable_web_page_preview=True,
+                                  parse_mode=ParseMode.HTML)
 
 
 async def normal_handler(event):

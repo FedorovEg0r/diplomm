@@ -11,10 +11,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="parsersetting",
-            name="parser",
-        ),
+
         migrations.AddField(
             model_name="parsersetting",
             name="city",
